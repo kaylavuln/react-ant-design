@@ -1,6 +1,6 @@
-import { Button, Space, Table } from 'antd';
+import { Button, Space, Table, Popconfirm } from 'antd';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import API from '../Axios';
 import { useNavigate } from "react-router-dom";
 
 const App = () => {
@@ -8,19 +8,25 @@ const App = () => {
   const [products, setProducts] = useState([]);
   useEffect(() => {
     fetchProducts();
- }, []);
- const fetchProducts = async () => {
-  const response = await axios.get('http://localhost/api/index.php');
-  setProducts(response.data);
+  }, []);
+  const fetchProducts = async () => {
+  const response = await API.get('/index.php');
+    setProducts(response.data);
+  };
+  const deleteProduct = async (record) => {
+    try {
+      await API.delete('http://localhost/api/delete.php?id='+record.id);
+      fetchProducts();
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
 };
   const columns = [
     {
-      
       title: 'ID',
       dataIndex: 'id'
     },
     {
-      
       title: 'Name',
       dataIndex: 'name'
     },
@@ -31,6 +37,16 @@ const App = () => {
     {
       title: 'Description',
       dataIndex: 'description'
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: (_, record) =>
+        products.length >= 1 ? (
+          <Popconfirm title="Sure to delete?" onConfirm={() => deleteProduct(record)}>
+            <a>Delete</a>
+          </Popconfirm>
+        ) : null,
     },
   ];
 

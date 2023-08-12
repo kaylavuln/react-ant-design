@@ -2,8 +2,7 @@ import { Button, Form, Input, InputNumber, message } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { useNavigate } from "react-router-dom";
 import {React} from 'react';
-import axios from 'axios';
-
+import API from '../Axios';
 const layout = {
   labelCol: {
     span: 3,
@@ -12,20 +11,22 @@ const layout = {
     span: 6,
   },
 };
-
 const success = (msg) => {
   message.success(msg);
 };
 
 const App = () => {
   let navigate = useNavigate();
-  const [form] = Form.useForm();
   const onFinish = async (values) => {
-      //console.log(values);
-      const response = await axios.post('http://localhost/api/add.php', values);
-      success(response.data);
-      //form.resetFields();
-      navigate("/product");
+      try {
+        const response = await API.post('http://localhost/api/add.php', values);
+        //console.log(response)
+        navigate("/product");
+        success(response.data);
+      } catch (error) {
+        //console.error('Error:', error);
+        //message.error('An error occurred');
+      }
   };
   return (
     <Form {...layout} onFinish={onFinish}>
